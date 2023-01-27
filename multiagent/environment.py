@@ -48,6 +48,7 @@ class MultiAgentEnv(gym.Env):
         # configure spaces
         self.action_space = []
         self.observation_space = []
+        self.total_dim=world.dim_p+world.dim_c
         for agent in self.agents:
             total_action_space = []
             # physical action space
@@ -60,6 +61,7 @@ class MultiAgentEnv(gym.Env):
                                             dtype=np.float32)
             if agent.movable:
                 total_action_space.append(u_action_space)
+            
             # communication action space
             if self.discrete_action_space:
                 c_action_space = spaces.Discrete(world.dim_c)
@@ -88,6 +90,8 @@ class MultiAgentEnv(gym.Env):
                 spaces.Box(low=-np.inf, high=+np.inf, shape=(obs_dim,),
                            dtype=np.float32))
             agent.action.c = np.zeros(self.world.dim_c)
+        #self.observation_space=self.observation_space[0]
+        #self.action_space=self.action_space[0]
 
         # rendering
         self.shared_viewer = shared_viewer
@@ -105,7 +109,7 @@ class MultiAgentEnv(gym.Env):
         self.agents = self.world.policy_agents
         # set action for each agent
         for i, agent in enumerate(self.agents):
-            self._set_action(action_n[i], agent, self.action_space[i])
+            self._set_action(action_n[i], agent, self.action_space[i]) #changed action_space from [i] to nothing
         # advance world state
         self.world.step()
         # record observation for each agent
@@ -175,7 +179,7 @@ class MultiAgentEnv(gym.Env):
             action = act
 
         if agent.movable:
-            agent.action.u = action
+            agent.action.u = action[0]
         else:
             agent.action.u = np.zeros(self.action_space[0].shape[0])
 
@@ -185,7 +189,7 @@ class MultiAgentEnv(gym.Env):
                 agent.action.c = np.zeros(self.world.dim_c)
                 agent.action.c[action[0]] = 1.0
             else:
-                agent.action.c = action[0]
+                agent.action.c = action[1]
             # action = action[1:]
 
     # reset rendering assets

@@ -15,3 +15,6 @@ setup(name='multiagent',
             'numpy-stl'
       ]
 )
+
+#add six==1.15.0
+#add pyglet=1.5.11
